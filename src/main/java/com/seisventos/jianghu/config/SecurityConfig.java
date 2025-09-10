@@ -4,6 +4,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
 // configuracao de seguranca basica / basic security configuration
@@ -11,12 +12,18 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableWebSecurity
 public class SecurityConfig {
 
+    // bean para criptografia de senhas / bean for password encryption
+    @Bean
+    public BCryptPasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
             // permite acesso a essas rotas sem login / allow access to these routes without login
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/", "/home", "/h2-console/**").permitAll()
+                .requestMatchers("/", "/home", "/register", "/h2-console/**").permitAll()
                 .anyRequest().authenticated()
             )
             // desabilita csrf para desenvolvimento / disable csrf for development
@@ -25,7 +32,18 @@ public class SecurityConfig {
                 .disable()
             )
             // permite frames para h2 console / allow frames for h2 console
-            .headers(headers -> headers.frameOptions().disable());
+            .headers(headers -> headers.frameOptions().disable())
+            // configuracao de login / login configuration
+            .formLogin(form -> form
+                .loginPage("/login")
+                .defaultSuccessUrl("/dashboard", true)
+                .permitAll()
+            )
+            // configuracao de logout / logout configuration
+            .logout(logout -> logout
+                .logoutSuccessUrl("/")
+                .permitAll()
+            );
             
         return http.build();
     }
