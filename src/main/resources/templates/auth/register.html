@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro - Seis Ventos de Jianghu</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-dark text-light">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-6 col-lg-5">
+                <div class="card bg-secondary mt-5">
+                    <div class="card-header text-center">
+                        <h3>Juntar-se ao Jianghu</h3>
+                    </div>
+                    <div class="card-body">
+                        <!-- formulario de registro / registration form -->
+                        <form th:action="@{/register}" method="post" th:object="${user}">
+                            
+                            <div class="mb-3">
+                                <label for="username" class="form-label">Usuario:</label>
+                                <input type="text" class="form-control" 
+                                       th:field="*{username}" 
+                                       th:class="${#fields.hasErrors('username')} ? 'form-control is-invalid' : 'form-control'">
+                                <div th:if="${#fields.hasErrors('username')}" class="invalid-feedback">
+                                    <span th:errors="*{username}"></span>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="email" class="form-label">Email:</label>
+                                <input type="email" class="form-control" 
+                                       th:field="*{email}"
+                                       th:class="${#fields.hasErrors('email')} ? 'form-control is-invalid' : 'form-control'">
+                                <div th:if="${#fields.hasErrors('email')}" class="invalid-feedback">
+                                    <span th:errors="*{email}"></span>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="password" class="form-label">Senha:</label>
+                                <input type="password" class="form-control" 
+                                       th:field="*{password}"
+                                       th:class="${#fields.hasErrors('password')} ? 'form-control is-invalid' : 'form-control'">
+                                <div th:if="${#fields.hasErrors('password')}" class="invalid-feedback">
+                                    <span th:errors="*{password}"></span>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="confirmPassword" class="form-label">Confirmar Senha:</label>
+                                <input type="password" class="form-control" 
+                                       th:field="*{confirmPassword}"
+                                       th:class="${#fields.hasErrors('confirmPassword')} ? 'form-control is-invalid' : 'form-control'">
+                                <div th:if="${#fields.hasErrors('confirmPassword')}" class="invalid-feedback">
+                                    <span th:errors="*{confirmPassword}"></span>
+                                </div>
+                            </div>
+                            
+                            <div class="d-grid gap-2">
+                                <button type="submit" class="btn btn-primary">Criar Conta</button>
+                            </div>
+                        </form>
+                        
+                        <hr>
+                        <div class="text-center">
+                            <p>Ja tem conta? <a th:href="@{/login}" class="text-light">Faca login</a></p>
+                            <p><a th:href="@{/}" class="text-light">Voltar ao inicio</a></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,45 +1,51 @@
 package com.seisventos.jianghu.config;
 
+import com.seisventos.jianghu.security.CustomUserDetailsService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
-// configuracao de seguranca basica / basic security configuration
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
 
-    // bean para criptografia de senhas / bean for password encryption
+    @Autowired
+    private CustomUserDetailsService userDetailsService;
+
     @Bean
     public BCryptPasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
     @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
+        return config.getAuthenticationManager();
+    }
+
+    @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-            // permite acesso a essas rotas sem login / allow access to these routes without login
+            .userDetailsService(userDetailsService)
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/", "/home", "/register", "/h2-console/**").permitAll()
                 .anyRequest().authenticated()
             )
-            // desabilita csrf para desenvolvimento / disable csrf for development
             .csrf(csrf -> csrf
                 .ignoringRequestMatchers("/h2-console/**")
                 .disable()
             )
-            // permite frames para h2 console / allow frames for h2 console
             .headers(headers -> headers.frameOptions().disable())
-            // configuracao de login / login configuration
             .formLogin(form -> form
                 .loginPage("/login")
                 .defaultSuccessUrl("/dashboard", true)
                 .permitAll()
             )
-            // configuracao de logout / logout configuration
             .logout(logout -> logout
                 .logoutSuccessUrl("/")
                 .permitAll()

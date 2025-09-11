@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Seis Ventos de Jianghu</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-dark text-light">
+    <!-- navbar / navigation bar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-secondary">
+        <div class="container">
+            <a class="navbar-brand" href="#">Jianghu RPG</a>
+            <div class="navbar-nav ms-auto">
+                <form th:action="@{/logout}" method="post" class="d-inline">
+                    <button type="submit" class="btn btn-outline-light btn-sm">Logout</button>
+                </form>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <div class="row">
+            <!-- boas vindas / welcome -->
+            <div class="col-12">
+                <div class="alert alert-info">
+                    <h4>Bem-vindo ao Jianghu!</h4>
+                    <p>Sua jornada no mundo dos rios e lagos comeca aqui.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <!-- salas de jogo / game rooms -->
+            <div class="col-md-6">
+                <div class="card bg-secondary mb-4">
+                    <div class="card-header">
+                        <h5>Salas de Jogo</h5>
+                    </div>
+                    <div class="card-body">
+                        <p>Gerencie suas salas de RPG ou entre em partidas existentes.</p>
+                        <button class="btn btn-primary me-2">Criar Sala</button>
+                        <button class="btn btn-outline-light">Entrar em Sala</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- personagens / characters -->
+            <div class="col-md-6">
+                <div class="card bg-secondary mb-4">
+                    <div class="card-header">
+                        <h5>Meus Personagens</h5>
+                    </div>
+                    <div class="card-body">
+                        <p>Gerencie suas fichas de personagem do sistema Seis Ventos.</p>
+                        <button class="btn btn-success me-2">Novo Personagem</button>
+                        <button class="btn btn-outline-light">Ver Fichas</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <!-- atividade recente / recent activity -->
+            <div class="col-12">
+                <div class="card bg-secondary">
+                    <div class="card-header">
+                        <h5>Atividade Recente</h5>
+                    </div>
+                    <div class="card-body">
+                        <p class="text-muted">Nenhuma atividade recente.</p>
+                        <small>Suas partidas e atualizacoes de personagem aparecerão aqui.</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
