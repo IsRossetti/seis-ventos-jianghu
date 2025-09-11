@@ -1,0 +1,41 @@
+# configuracao do spring boot para seis ventos de jianghu
+# spring boot configuration for seis ventos de jianghu
+spring:
+  application:
+    name: seis-ventos-jianghu
+  
+  # configuracao do banco h2 (desenvolvimento)
+  # h2 database configuration (development)
+  datasource:
+    url: jdbc:h2:mem:jianghu_db
+    driver-class-name: org.h2.Driver
+    username: jianghu
+    password: cultivador123
+  
+  # console h2 para ver o banco (http://localhost:8080/h2-console)
+  # h2 console to view database (http://localhost:8080/h2-console)
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+  
+  # jpa/hibernate
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: create-drop # recria tabelas a cada restart / recreates tables on restart
+    show-sql: true # mostra queries sql no console / shows sql queries in console
+    
+  # thymeleaf (nossa engine de templates / our template engine)
+  thymeleaf:
+    cache: false # nao faz cache durante desenvolvimento / no cache during development
+
+# configuracoes do servidor / server configurations
+server:
+  port: 8080
+  
+# logs para debug / debug logs
+logging:
+  level:
+    com.seisventos.jianghu: DEBUG
+    org.springframework.security: DEBUG
