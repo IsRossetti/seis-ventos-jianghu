@@ -36,6 +36,7 @@ public class SecurityConfig {
                 .requestMatchers("/", "/home", "/register", "/h2-console/**").permitAll()
                 
                 .requestMatchers("/rooms/**").authenticated()
+                .requestMatchers("/api/chat/**", "/ws/**").authenticated()
                 .anyRequest().authenticated()
             )
             .csrf(csrf -> csrf

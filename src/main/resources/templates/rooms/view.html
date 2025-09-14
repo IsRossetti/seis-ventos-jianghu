@@ -46,8 +46,31 @@
                         
                         <div class="mt-3" th:if="${isParticipant}">
                             <h5>Chat da Sala</h5>
-                            <div class="bg-dark p-3 rounded">
-                                <p class="text-muted">Sistema de chat sera implementado em breve...</p>
+                            <div class="card bg-dark">
+                                <div class="card-body p-2">
+                                    <!-- area de mensagens -->
+                                    <div id="chatMessages" class="bg-secondary p-3 rounded mb-3" style="height: 300px; overflow-y: auto;">
+                                        <p class="text-muted text-center">Carregando mensagens...</p>
+                                    </div>
+                                    
+                                    <!-- formulario de envio -->
+                                    <div class="row g-2">
+                                        <div class="col-2">
+                                            <select id="messageType" class="form-select form-select-sm">
+                                                <option value="CHAT">Chat</option>
+                                                <option value="NARRATION">Narração</option>
+                                                <option value="DICE_ROLL">Dados</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-8">
+                                            <input type="text" id="messageInput" class="form-control form-control-sm" 
+                                                   placeholder="Digite sua mensagem..." maxlength="1000">
+                                        </div>
+                                        <div class="col-2">
+                                            <button id="sendButton" class="btn btn-primary btn-sm w-100">Enviar</button>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -87,5 +110,120 @@
             </div>
         </div>
     </div>
+
+<!-- scripts websocket - NO FINAL DO BODY -->
+<script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
+
+<script th:if="${isParticipant}">
+    let stompClient = null;
+    const roomId = /*[[${room.id}]]*/ 1;
+    const currentUser = /*[['${currentUser.username}']]*/  'admin';
+    
+    // conectar websocket
+    function connect() {
+        const socket = new SockJS('/ws');
+        stompClient = Stomp.over(socket);
+        
+        stompClient.connect({}, function(frame) {
+            console.log('Conectado: ' + frame);
+            
+            // inscrever no topico da sala
+            stompClient.subscribe('/topic/room/' + roomId, function(message) {
+                showMessage(JSON.parse(message.body));
+            });
+            
+            // carregar mensagens existentes
+            loadMessages();
+        });
+    }
+    
+    // carregar mensagens do historico
+    function loadMessages() {
+        fetch('/api/chat/' + roomId + '/messages')
+            .then(response => response.json())
+            .then(messages => {
+                const chatDiv = document.getElementById('chatMessages');
+                chatDiv.innerHTML = '';
+                messages.forEach(msg => showMessage(msg));
+                scrollToBottom();
+            })
+            .catch(error => {
+                console.error('Erro ao carregar mensagens:', error);
+                document.getElementById('chatMessages').innerHTML = 
+                    '<p class="text-danger text-center">Erro ao carregar mensagens</p>';
+            });
+    }
+    
+    // mostrar mensagem na tela
+    function showMessage(message) {
+        const chatDiv = document.getElementById('chatMessages');
+        const messageDiv = document.createElement('div');
+        messageDiv.className = 'mb-2';
+        
+        const time = new Date(message.sentAt).toLocaleTimeString('pt-BR', {
+            hour: '2-digit', minute: '2-digit'
+        });
+        
+        let typeClass = 'text-light';
+        let typePrefix = '';
+        
+        switch(message.type) {
+            case 'SYSTEM':
+                typeClass = 'text-warning';
+                typePrefix = '[Sistema] ';
+                break;
+            case 'NARRATION':
+                typeClass = 'text-info';
+                typePrefix = '[Narração] ';
+                break;
+            case 'DICE_ROLL':
+                typeClass = 'text-success';
+                typePrefix = '[Dados] ';
+                break;
+        }
+        
+messageDiv.innerHTML = `
+            <small class="text-muted">${time}</small>
+            <strong class="${typeClass}">${typePrefix}${message.user.username}:</strong>
+            <span>${message.content}</span>
+        `;
+        
+        chatDiv.appendChild(messageDiv);
+        scrollToBottom();
+    }
+    
+    // enviar mensagem
+    function sendMessage() {
+        const messageInput = document.getElementById('messageInput');
+        const messageType = document.getElementById('messageType').value;
+        const content = messageInput.value.trim();
+        
+        if (content && stompClient) {
+            stompClient.send('/app/chat/' + roomId, {}, JSON.stringify({
+                content: content,
+                type: messageType
+            }));
+            messageInput.value = '';
+        }
+    }
+    
+    function scrollToBottom() {
+        const chatDiv = document.getElementById('chatMessages');
+        chatDiv.scrollTop = chatDiv.scrollHeight;
+    }
+    
+    // eventos
+    document.getElementById('sendButton').addEventListener('click', sendMessage);
+    document.getElementById('messageInput').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            sendMessage();
+        }
+    });
+    
+    // conectar ao carregar a pagina
+    connect();
+</script>
+
 </body>
 </html>
