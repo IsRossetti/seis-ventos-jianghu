@@ -34,6 +34,8 @@ public class SecurityConfig {
             .userDetailsService(userDetailsService)
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/", "/home", "/register", "/h2-console/**").permitAll()
+                
+                .requestMatchers("/rooms/**").authenticated()
                 .anyRequest().authenticated()
             )
             .csrf(csrf -> csrf
